@@ -1,0 +1,9 @@
+{
+  "name": "client",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.18.0"
+  }
+}
