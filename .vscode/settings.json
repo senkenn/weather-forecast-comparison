@@ -3,6 +3,9 @@
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
+  "[python]": {
+    "editor.tabSize": 4
+  },
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit"
   },
