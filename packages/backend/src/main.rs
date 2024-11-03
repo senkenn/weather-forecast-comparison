@@ -62,6 +62,8 @@ async fn main() {
 
 // basic handler that responds with a static string
 async fn root() -> &'static str {
+    println!("hello world called");
+
     "Hello, World!"
 }
 
