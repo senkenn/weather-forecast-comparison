@@ -1,0 +1,6 @@
+ignorePaths:
+  - settings.json
+  - extensions.json
+  - "*.svg"
+words:
+  - lefthook

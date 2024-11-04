@@ -5,7 +5,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "cspell": "^8.15.7",
+    "lefthook": "^1.8.2",
     "typescript": "^5.5.4"
-  },
-  "packageManager": "pnpm@5.15.3+sha512.dc4e7700816e91003c3808187086fb746379f8c03419f34af27309c2e4fab039cb0bf6d4b3db9449cf826872b1677e12231fcae5b1fb81ce90d6483647f02256"
+  }
 }
