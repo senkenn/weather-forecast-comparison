@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import * as echarts from "echarts";
+import { useEffect, useRef, useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    const chartInstance = echarts.init(chartRef.current);
+
+    // グラフのオプション設定
+    const options = {
+      title: {
+        text: "Sample Line Chart",
+      },
+      tooltip: {
+        trigger: "axis",
+      },
+      legend: {
+        data: ["Dataset 1", "Dataset 2"],
+      },
+      xAxis: {
+        type: "category",
+        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      },
+      yAxis: {
+        type: "value",
+      },
+      series: [
+        {
+          name: "Dataset 1",
+          type: "line",
+          data: [120, 132, 101, 134, 90, 230, 210],
+        },
+        {
+          name: "Dataset 2",
+          type: "line",
+          data: [220, 182, 191, 234, 290, 330, 310],
+        },
+      ],
+    };
+
+    // オプションを使ってグラフを描画
+    chartInstance.setOption(options);
+
+    // クリーンアップ
+    return () => {
+      chartInstance.dispose();
+    };
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h3>ECharts Line Chart with Legend Toggle</h3>
+      <div ref={chartRef} style={{ width: "200%", height: "400px" }} />
+    </div>
+  );
 }
 
-export default App
+export default App;
