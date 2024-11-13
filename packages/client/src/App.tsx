@@ -9,7 +9,7 @@ import {
   YAxis,
 } from "recharts";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import * as duckdb from "@duckdb/duckdb-wasm";
 import eh_worker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
@@ -75,44 +75,71 @@ const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   },
 };
 
+const DUCKDB_BUNDLES: duckdb.DuckDBBundles = {
+  mvp: {
+    mainModule: duckdb_wasm,
+    mainWorker: new URL(
+      "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js",
+      import.meta.url,
+    ).toString(),
+  },
+  eh: {
+    mainModule: duckdb_wasm_eh,
+    mainWorker: new URL(
+      "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js",
+      import.meta.url,
+    ).toString(),
+  },
+};
+
 function App() {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const [result, setResult] = useState<any>(null);
 
-  useEffect(() => {
-    (async () => {
-      // Select a bundle based on browser checks
-      const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
-      if (bundle.mainWorker === null) {
-        console.error("No bundle available for this browser");
-        return;
-      }
-      // Instantiate the asynchronous version of DuckDB-wasm
-      const worker = new Worker(bundle.mainWorker);
-      const logger = new duckdb.ConsoleLogger();
-      const db = new duckdb.AsyncDuckDB(logger, worker);
-      await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setResult(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const csvText = reader.result as string;
 
-      const conn = await db.connect();
-      setResult(
-        await conn.query<{ v: Int }>(
-          "SELECT count(*)::INTEGER as v FROM generate_series(0, 100) t(v)",
-        ),
-      );
+        const bundle = await duckdb.selectBundle(DUCKDB_BUNDLES);
+        const logger = new duckdb.ConsoleLogger();
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        const worker = new Worker(bundle.mainWorker!);
+        const db = new duckdb.AsyncDuckDB(logger, worker);
+        await db.instantiate(bundle.mainModule);
+        const conn = await db.connect();
 
-      await conn.close();
-      await db.terminate();
-      await worker.terminate();
-    })();
-  }, []);
+        // CSVファイルを仮想ファイルとして登録
+        await db.registerFileBuffer(
+          "amedas_url_list1.csv",
+          new TextEncoder().encode(csvText),
+        );
+
+        // 仮想ファイルに対してクエリを実行
+        await conn.query(
+          `CREATE TABLE amedas_url_list AS SELECT * FROM read_csv_auto('amedas_url_list1.csv')`,
+        );
+        const duckdbResult = await conn.query("SELECT * FROM amedas_url_list");
+        setResult(duckdbResult.batches[0].data.children);
+
+        await conn.close();
+      };
+      reader.readAsText(file);
+    }
+  };
 
   return (
     <>
       <h2> Weather Forecast Comparison</h2>
-
+      <input type="file" accept=".csv" onChange={handleFileUpload} />
+      {/* <p>レンダリング回数: {renderCount.current}</p>{" "} */}
+      {/* レンダリング回数を表示 */}
       <pre style={{ textAlign: "left" }}>
         {JSON.stringify(result, undefined, 2)}
       </pre>
-
       <ResponsiveContainer width={"101%"} height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
