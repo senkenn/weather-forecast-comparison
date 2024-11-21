@@ -4,3 +4,4 @@ ignorePaths:
   - "*.svg"
 words:
   - lefthook
+  - usecase

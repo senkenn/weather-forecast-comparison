@@ -1,6 +1,5 @@
 mod interface_adaptors {
     pub mod handler;
-    pub mod repository;
 }
 mod application_business_rules {
     pub mod usecase;
@@ -9,22 +8,15 @@ mod enterprise_business_rules {
     pub mod domain {
         pub mod entity;
         pub mod model;
-        pub mod repository_interface;
     }
 }
 
 use std::{fs::File, io::Read, path::Path, sync::Arc};
 
-use application_business_rules::usecase::student::StudentUsecase;
-use enterprise_business_rules::domain::repository_interface::student::IStudentRepository;
-use interface_adaptors::{
-    handler::student::{CreateUser, StudentHandler},
-    repository,
-};
+use application_business_rules::usecase::correct_weather_data::WeatherUsecase;
+use interface_adaptors::handler::correct_weather_data::{CsvUpload, WeatherHandler};
 
 use axum::{
-    extract::{Json, State},
-    http::StatusCode,
     routing::{get, post},
     Router,
 };
@@ -58,11 +50,11 @@ fn html_table_to_csv(csv_file_path: &str) -> Result<(), Box<dyn Error>> {
 
 #[tokio::main]
 async fn main() {
-    if let Err(e) = html_table_to_csv("output.csv") {
-        eprintln!("Error generating CSV file: {}", e);
-        return;
-    }
-    println!("CSV file generated successfully!");
+    // if let Err(e) = html_table_to_csv("output.csv") {
+    //     eprintln!("Error generating CSV file: {}", e);
+    //     return;
+    // }
+    // println!("CSV file generated successfully!");
 
     // initialize tracing
     tracing_subscriber::registry()
@@ -73,17 +65,16 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let repository: Arc<dyn IStudentRepository> =
-        Arc::new(repository::student::InMemoryStudentRepository::new());
-    let usecase = Arc::new(StudentUsecase::new(repository));
-    let handler = Arc::new(StudentHandler::new(usecase));
+    let usecase = Arc::new(WeatherUsecase::new());
+    let handler = Arc::new(WeatherHandler::new(usecase));
 
     // build our application with a route
     let app = Router::new()
-        // `GET /` goes to `root`
         .route("/", get(root))
-        // `POST /users` goes to `create_user`
-        .route("/users", post(handle_create_student))
+        .route(
+            "/api/correct-weather-data",
+            post(WeatherHandler::correct_weather_data),
+        )
         .with_state(handler);
 
     // run our app with hyper, listening globally on port 8080
@@ -97,13 +88,4 @@ async fn root() -> &'static str {
     println!("hello world called");
 
     "Hello, World!"
-}
-
-// Define your handler function with #[axum::debug_handler]
-#[axum::debug_handler]
-async fn handle_create_student(
-    State(handler): State<Arc<StudentHandler>>,
-    Json(payload): Json<CreateUser>,
-) -> StatusCode {
-    handler.create_student(Json(payload)).await
 }
