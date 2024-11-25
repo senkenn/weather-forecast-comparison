@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use crate::application_business_rules::usecase::correct_weather_data::WeatherUsecase;
+use crate::{
+    application_business_rules::usecase::correct_weather_data::WeatherUsecase,
+    enterprise_business_rules::domain::model::jma_observation_data::Date,
+};
 use axum::{
     extract::{Json, State},
     http::StatusCode,
@@ -15,8 +18,9 @@ pub enum WeatherDataType {
 }
 
 #[derive(Deserialize)]
-pub struct CsvUpload {
+pub struct WeatherDataPayload {
     pub weather_data_type: WeatherDataType,
+    pub date: Date,
 }
 
 pub struct WeatherHandler {
@@ -30,15 +34,12 @@ impl WeatherHandler {
 
     pub async fn correct_weather_data(
         State(handler): State<Arc<WeatherHandler>>,
-        Json(payload): Json<CsvUpload>,
+        Json(payload): Json<WeatherDataPayload>,
     ) -> StatusCode {
-        // TODO: validate payload
-        println!("called handler");
-
-        handler
-            .usecase
-            .correct_weather_data(payload.weather_data_type)
-            .await;
+        if let Err(e) = handler.usecase.correct_weather_data(payload).await {
+            eprintln!("Error correcting weather data: {}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR;
+        }
         StatusCode::CREATED
     }
 }
