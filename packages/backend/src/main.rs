@@ -20,17 +20,21 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[tokio::main]
 async fn main() {
-    // initialize tracing
+    // Define the log filter with specific levels for modules
+    let filter = EnvFilter::new("info,aws_smithy_runtime=info,aws_sdk_s3=info,aws_types=info");
+
+    // Initialize tracing with the defined filter
     tracing_subscriber::registry()
+        .with(filter)
         .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "debug".into()),
+            tracing_subscriber::fmt::layer()
+                .with_file(true)
+                .with_line_number(true),
         )
-        .with(tracing_subscriber::fmt::layer())
         .init();
 
     let usecase = Arc::new(WeatherUsecase::new());
