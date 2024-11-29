@@ -4,5 +4,7 @@ ignorePaths:
   - "*.svg"
 words:
   - lefthook
+  - npmignore
   - reqwest
   - usecase
+  - vite
