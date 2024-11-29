@@ -2,12 +2,12 @@ use std::path::Path;
 
 use anyhow::Result;
 use aws_config::{meta::region::RegionProviderChain, BehaviorVersion};
-use aws_sdk_s3::{operation::put_object::PutObjectOutput, primitives::ByteStream, Client};
+use aws_sdk_s3::{primitives::ByteStream, Client};
 use csv::Writer;
 use scraper::{Html, Selector};
 use serde::Deserialize;
 
-use crate::enterprise_business_rules::domain::entity::jma_observation_data::JmaObservationData;
+pub struct JmaObservationData {}
 
 #[derive(Deserialize, Clone)]
 pub struct Date {
@@ -75,7 +75,7 @@ impl JmaObservationData {
 
         let bucket = "weather-forecast-comparison-data-store";
         let key = format!(
-            "uploads/{}",
+            "{}",
             Path::new(csv_file_path)
                 .file_name()
                 .unwrap()

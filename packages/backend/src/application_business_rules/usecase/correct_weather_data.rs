@@ -1,5 +1,5 @@
 use crate::{
-    enterprise_business_rules::domain::entity::jma_observation_data::JmaObservationData,
+    enterprise_business_rules::domain::model::jma_observation_data::JmaObservationData,
     interface_adaptors::handler::correct_weather_data::{WeatherDataPayload, WeatherDataType},
 };
 use anyhow::Result;

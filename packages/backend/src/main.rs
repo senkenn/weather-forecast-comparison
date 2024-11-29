@@ -6,7 +6,6 @@ mod application_business_rules {
 }
 mod enterprise_business_rules {
     pub mod domain {
-        pub mod entity;
         pub mod model;
     }
 }

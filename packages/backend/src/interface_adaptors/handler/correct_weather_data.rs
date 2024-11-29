@@ -37,7 +37,7 @@ impl WeatherHandler {
         Json(payload): Json<WeatherDataPayload>,
     ) -> StatusCode {
         if let Err(e) = handler.usecase.correct_weather_data(payload).await {
-            eprintln!("Error correcting weather data: {}", e);
+            tracing::error!("Error correcting weather data: {:?}", e);
             return StatusCode::INTERNAL_SERVER_ERROR;
         }
         StatusCode::CREATED
