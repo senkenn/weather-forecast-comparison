@@ -14,7 +14,8 @@ export class S3Stack extends cdk.Stack {
     //   visibilityTimeout: cdk.Duration.seconds(300)
     // });
 
-    new Bucket(this, "weather-forecast-comparison-data-store", {
+    new Bucket(this, "MyBucket", {
+      bucketName: "weather-forecast-comparison-data-store",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
   }
