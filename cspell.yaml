@@ -3,6 +3,7 @@ ignorePaths:
   - extensions.json
   - "*.svg"
 words:
+  - ipynb
   - lefthook
   - npmignore
   - reqwest
