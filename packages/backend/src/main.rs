@@ -13,6 +13,7 @@ mod enterprise_business_rules {
 use std::sync::Arc;
 
 use application_business_rules::usecase::correct_weather_data::WeatherUsecase;
+use dotenvy::dotenv;
 use interface_adaptors::handler::correct_weather_data::WeatherHandler;
 
 use axum::{
@@ -23,6 +24,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 
 #[tokio::main]
 async fn main() {
+    dotenv().expect(".env file not found");
+
     // Define the log filter with specific levels for modules
     let filter = EnvFilter::new("info,aws_smithy_runtime=info,aws_sdk_s3=info,aws_types=info");
 

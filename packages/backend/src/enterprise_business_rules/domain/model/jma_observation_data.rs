@@ -1,8 +1,4 @@
-use std::path::Path;
-
 use anyhow::Result;
-use aws_config::{meta::region::RegionProviderChain, BehaviorVersion};
-use aws_sdk_s3::{primitives::ByteStream, Client};
 use csv::Writer;
 use scraper::{Html, Selector};
 use serde::Deserialize;
@@ -19,10 +15,6 @@ pub struct Date {
 type CsvFileName = String;
 
 impl JmaObservationData {
-    pub fn new() -> Self {
-        JmaObservationData {}
-    }
-
     async fn fetch_html(date: Date) -> Result<String> {
         let prec_no = 44; // Tokyo
         let block_no = 47662; // Tokyo
@@ -62,40 +54,5 @@ impl JmaObservationData {
         tracing::info!("Created CSV file: {}", csv_file_name);
 
         Ok(csv_file_name)
-    }
-
-    pub async fn upload_to_s3(&self, csv_file_path: &str) -> Result<()> {
-        // Initialize AWS configuration
-        let region_provider = RegionProviderChain::default_provider().or_else("ap-northeast-1");
-        let config = aws_config::defaults(BehaviorVersion::v2024_03_28())
-            .region(region_provider)
-            .load()
-            .await;
-        let client = Client::new(&config);
-
-        let bucket = "weather-forecast-comparison-data-store";
-        let key = format!(
-            "{}",
-            Path::new(csv_file_path)
-                .file_name()
-                .unwrap()
-                .to_str()
-                .unwrap()
-        );
-
-        // Read the CSV file into a byte stream
-        let byte_stream = ByteStream::from_path(Path::new(csv_file_path)).await?;
-
-        // Perform the upload
-        client
-            .put_object()
-            .bucket(bucket)
-            .key(key)
-            .body(byte_stream)
-            .send()
-            .await?;
-        tracing::info!("Uploaded CSV file to S3");
-
-        Ok(())
     }
 }
