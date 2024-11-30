@@ -111,29 +111,21 @@ async function getFileFromS3(bucketName: string, key: string): Promise<string> {
 function App() {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const [result, setResult] = useState<any>(null);
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const [duckdbData, setDuckDBData] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
       const bucketName = "weather-forecast-comparison-data-store";
       const key = "jma_observation_data_2024_11_1.csv";
+      const csvFIleName = key;
 
       try {
         const fileContent = await getFileFromS3(bucketName, key);
         setResult(fileContent);
-      } catch (err) {
-        console.error("Failed to get file from S3:", err);
-        setResult(err);
-      }
-    })();
-  }, []);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    setResult(file);
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const csvText = reader.result as string;
+        // text to csv file
+        new File([fileContent], key, { type: "text/csv" });
 
         const bundle = await duckdb.selectBundle(DUCKDB_BUNDLES);
         const logger = new duckdb.ConsoleLogger();
@@ -145,32 +137,44 @@ function App() {
 
         // CSVファイルを仮想ファイルとして登録
         await db.registerFileBuffer(
-          "amedas_url_list1.csv",
-          new TextEncoder().encode(csvText),
+          csvFIleName,
+          new TextEncoder().encode(fileContent),
         );
 
         // 仮想ファイルに対してクエリを実行
         await conn.query(
-          `CREATE TABLE amedas_url_list AS SELECT * FROM read_csv_auto('amedas_url_list1.csv')`,
+          `CREATE TABLE amedas_url_list AS SELECT * FROM read_csv_auto('jma_observation_data_2024_11_1.csv')`,
         );
         const duckdbResult = await conn.query("SELECT * FROM amedas_url_list");
-        setResult(duckdbResult.batches[0].data.children);
+        setDuckDBData(duckdbResult.toArray());
 
         await conn.close();
-      };
-      reader.readAsText(file);
-    }
-  };
+      } catch (err) {
+        console.error("Failed to get file from S3:", err);
+        setResult(err);
+      }
+    })();
+  }, []);
 
   return (
     <>
       <h2> Weather Forecast Comparison</h2>
-      <input type="file" accept=".csv" onChange={handleFileUpload} />
-      {/* <p>レンダリング回数: {renderCount.current}</p>{" "} */}
-      {/* レンダリング回数を表示 */}
       <pre style={{ textAlign: "left" }}>
         {JSON.stringify(result, undefined, 2)}
       </pre>
+      <table>
+        <tbody>
+          {duckdbData.map((row, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+            <tr key={i}>
+              {Object.keys(row).map((key) => (
+                <td key={key}>{row[key]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <ResponsiveContainer width={"101%"} height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
