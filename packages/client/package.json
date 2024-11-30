@@ -4,12 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "env": "bash scripts/create_env.sh",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.701.0",
     "@duckdb/duckdb-wasm": "^1.29.0",
     "apache-arrow": "^18.0.0",
     "echarts": "^5.5.1",

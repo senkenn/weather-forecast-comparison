@@ -1,3 +1,6 @@
 {
-  "name": "backend"
+  "name": "backend",
+  "scripts": {
+    "env": "bash scripts/create_env.sh"
+  }
 }
