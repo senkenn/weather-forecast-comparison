@@ -6,7 +6,7 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3_deployment from "aws-cdk-lib/aws-s3-deployment";
 import type { Construct } from "constructs";
 
-export class S3Stack extends cdk.Stack {
+export class MainStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 

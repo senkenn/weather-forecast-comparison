@@ -23,31 +23,6 @@ importers:
 
   packages/backend: {}
 
-  packages/cdk:
-    dependencies:
-      aws-cdk-lib:
-        specifier: 2.171.1
-        version: 2.171.1(constructs@10.4.2)
-      constructs:
-        specifier: ^10.0.0
-        version: 10.4.2
-    devDependencies:
-      '@types/node':
-        specifier: 22.7.9
-        version: 22.7.9
-      aws-cdk:
-        specifier: 2.171.1
-        version: 2.171.1
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.8.0(@swc/helpers@0.5.15))(@types/node@22.7.9)(typescript@5.6.3)
-      typescript:
-        specifier: ~5.6.3
-        version: 5.6.3
-      vite:
-        specifier: ^5.4.10
-        version: 5.4.10(@types/node@22.7.9)
-
   packages/client:
     dependencies:
       '@aws-sdk/client-s3':
@@ -84,6 +59,31 @@ importers:
       globals:
         specifier: ^15.11.0
         version: 15.11.0
+      vite:
+        specifier: ^5.4.10
+        version: 5.4.10(@types/node@22.7.9)
+
+  packages/infra:
+    dependencies:
+      aws-cdk-lib:
+        specifier: 2.171.1
+        version: 2.171.1(constructs@10.4.2)
+      constructs:
+        specifier: ^10.0.0
+        version: 10.4.2
+    devDependencies:
+      '@types/node':
+        specifier: 22.7.9
+        version: 22.7.9
+      aws-cdk:
+        specifier: 2.171.1
+        version: 2.171.1
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@swc/core@1.8.0(@swc/helpers@0.5.15))(@types/node@22.7.9)(typescript@5.6.3)
+      typescript:
+        specifier: ~5.6.3
+        version: 5.6.3
       vite:
         specifier: ^5.4.10
         version: 5.4.10(@types/node@22.7.9)
