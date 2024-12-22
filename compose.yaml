@@ -1,5 +1,5 @@
 services:
-  backend:
+  app:
     build: .
     volumes:
       - .:/workspace

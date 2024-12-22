@@ -16,5 +16,5 @@
   "[python]": {
     "editor.tabSize": 4
   },
-  "rust-analyzer.linkedProjects": ["packages/backend/Cargo.toml"]
+  "rust-analyzer.linkedProjects": ["packages/cron_jobs/Cargo.toml"]
 }

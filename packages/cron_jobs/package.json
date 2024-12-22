@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "cron_jobs",
   "scripts": {
     "env": "bash scripts/create_env.sh"
   }
