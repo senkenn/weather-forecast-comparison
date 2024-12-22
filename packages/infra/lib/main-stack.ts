@@ -10,15 +10,9 @@ export class MainStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Web サイトホスティング用 S3 バケットの作成
-    const websiteBucket = new s3.Bucket(this, "WebsiteBucket", {
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-    });
-
-    // CSV データ用 S3 バケットの作成
-    const dataBucket = new s3.Bucket(this, "DataBucket", {
-      bucketName: "weather-forecast-comparison-data-store",
+    // Web サイトホスティング 兼 データ置き場用の S3 バケットの作成
+    const bucket = new s3.Bucket(this, "weather-forecast-comparison", {
+      bucketName: "weather-forecast-comparison",
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
@@ -29,17 +23,7 @@ export class MainStack extends cdk.Stack {
       defaultBehavior: {
         origin:
           // S3 バケットへの OAC によるアクセス制御を設定
-          cloudfrontOrigins.S3BucketOrigin.withOriginAccessControl(
-            websiteBucket,
-          ),
-      },
-      additionalBehaviors: {
-        "/data/*": {
-          origin:
-            cloudfrontOrigins.S3BucketOrigin.withOriginAccessControl(
-              dataBucket,
-            ),
-        },
+          cloudfrontOrigins.S3BucketOrigin.withOriginAccessControl(bucket),
       },
     });
 
@@ -48,12 +32,12 @@ export class MainStack extends cdk.Stack {
       value: `https://${distribution.distributionDomainName}`,
     });
 
-    // Web サイトの S3 バケットへのコンテンツのデプロイ
+    // S3 バケットへの Website コンテンツのデプロイ
     new s3_deployment.BucketDeployment(this, "WebsiteDeploy", {
       sources: [
         s3_deployment.Source.asset(path.join(__dirname, "../../client/dist")),
       ],
-      destinationBucket: websiteBucket,
+      destinationBucket: bucket,
       distribution: distribution,
       distributionPaths: ["/*"],
     });
