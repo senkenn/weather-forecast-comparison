@@ -2,7 +2,7 @@
   "name": "weather-forecast-comparison",
   "version": "0.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy:client": "pnpm --filter client build && pnpm --filter infra cdk deploy"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
