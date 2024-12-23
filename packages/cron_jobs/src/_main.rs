@@ -12,7 +12,7 @@ mod enterprise_business_rules {
 
 use std::sync::Arc;
 
-use application_business_rules::usecase::correct_weather_data::WeatherUsecase;
+use application_business_rules::usecase::harvest_past_weather_data::WeatherUsecase;
 use dotenvy::dotenv;
 use interface_adaptors::handler::correct_weather_data::WeatherHandler;
 
@@ -40,26 +40,28 @@ async fn main() {
         .init();
 
     let usecase = Arc::new(WeatherUsecase::new());
-    let handler = Arc::new(WeatherHandler::new(usecase));
+    usecase.harvest_past_weather_data().await;
+
+    // let handler = Arc::new(WeatherHandler::new(usecase));
 
     // build our application with a route
-    let app = Router::new()
-        .route("/", get(root))
-        .route(
-            "/api/correct-weather-data",
-            post(WeatherHandler::correct_weather_data),
-        )
-        .with_state(handler);
+    // let app = Router::new()
+    //     .route("/", get(root))
+    //     .route(
+    //         "/api/correct-weather-data",
+    //         post(WeatherHandler::correct_weather_data),
+    //     )
+    //     .with_state(handler);
 
     // run our app with hyper, listening globally on port 8080
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
-    tracing::info!("Server listening on http://localhost:8080");
-    axum::serve(listener, app).await.unwrap();
+    // let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+    // tracing::info!("Server listening on http://localhost:8080");
+    // axum::serve(listener, app).await.unwrap();
 }
 
 // basic handler that responds with a static string
-async fn root() -> &'static str {
-    println!("hello world called");
+// async fn root() -> &'static str {
+//     println!("hello world called");
 
-    "Hello, World!"
-}
+//     "Hello, World!"
+// }
