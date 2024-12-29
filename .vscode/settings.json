@@ -16,5 +16,6 @@
   "[python]": {
     "editor.tabSize": 4
   },
-  "rust-analyzer.linkedProjects": ["packages/cron_jobs/Cargo.toml"]
+  "rust-analyzer.linkedProjects": ["packages/cron_jobs/Cargo.toml"],
+  "github-actions.workflows.pinned.workflows": [".github/workflows/daily.yaml"]
 }
