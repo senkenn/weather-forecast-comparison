@@ -1,0 +1,37 @@
+on:
+  schedule:
+    - cron: "0 0 * * *" # Run at 9 AM in JST
+  push:
+    branches:
+      - main
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db
+            packages/cron_jobs/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build
+        run: cargo build --release
+        working-directory: packages/cron_jobs
+
+      - name: Set AWS credentials to .env file
+        run: |
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> .env
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> .env
+
+      - name: Harvest the observation weather data
+        run: ./packages/cron_jobs/target/release/harvest_observation_weather_data
