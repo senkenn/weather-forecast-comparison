@@ -10,5 +10,13 @@ pub mod enterprise_business_rules {
 }
 
 pub mod interface_adapters {
-    pub mod services;
+    pub mod csv_writer_interface;
+    pub mod s3_service;
+    pub mod scraper_interface;
+}
+
+pub mod frameworks_drivers {
+    pub mod csv_writer;
+    pub mod date;
+    pub mod scraper;
 }

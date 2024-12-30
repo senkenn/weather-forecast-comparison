@@ -1,7 +1,6 @@
 use anyhow::Result;
 use aws_config::{meta::region::RegionProviderChain, BehaviorVersion};
 use aws_sdk_s3::{primitives::ByteStream, Client};
-use axum::async_trait;
 use std::path::Path;
 use tracing::info;
 
@@ -15,7 +14,7 @@ impl S3Service {
     }
 }
 
-#[async_trait]
+#[async_trait::async_trait]
 impl IS3Service for S3Service {
     async fn upload_to_s3(&self, csv_file_path: String) -> Result<()> {
         let region_provider = RegionProviderChain::default_provider().or_else("ap-northeast-1");
