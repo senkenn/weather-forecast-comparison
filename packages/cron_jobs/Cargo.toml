@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = { version = "1.0.93", features = ["backtrace", "std"] }
+async-trait = "0.1.83"
 aws-config = "1.5.10"
 aws-sdk-s3 = "1.63.0"
 axum = { version = "0.7.6", features = ["macros"] }

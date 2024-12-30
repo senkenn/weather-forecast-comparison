@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use cron_jobs::application_business_rules::services_interface::IS3Service;
 use cron_jobs::application_business_rules::usecase::harvest_observation_weather_data::WeatherUsecase;
 use cron_jobs::interface_adapters::services::s3_service::S3Service;
 use dotenvy::dotenv;
@@ -21,7 +20,7 @@ async fn main() {
         )
         .init();
 
-    let s3_service: Arc<dyn IS3Service> = Arc::new(S3Service::new());
+    let s3_service = Arc::new(S3Service::new());
     let usecase = Arc::new(WeatherUsecase::new(s3_service));
     match usecase.harvest_observation_weather_data().await {
         Ok(_) => {
