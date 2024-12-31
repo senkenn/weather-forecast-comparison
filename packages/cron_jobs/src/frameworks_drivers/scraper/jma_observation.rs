@@ -1,4 +1,5 @@
 use anyhow::Result;
+use async_trait::async_trait;
 use tracing::info;
 
 use crate::{
@@ -14,7 +15,7 @@ impl Scraper {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl IScraper for Scraper {
     async fn fetch_data(&self, date: DateWrapper) -> Result<String> {
         let prec_no = 44; // Tokyo

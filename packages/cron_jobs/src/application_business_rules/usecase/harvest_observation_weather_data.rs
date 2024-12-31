@@ -24,7 +24,7 @@ impl WeatherUsecase {
     }
 
     pub async fn harvest_observation_weather_data(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let yesterday = DateWrapper::new().get_yesterday();
+        let yesterday = DateWrapper::now().get_yesterday();
 
         let html = self.scraper.fetch_data(yesterday.clone()).await?;
 
