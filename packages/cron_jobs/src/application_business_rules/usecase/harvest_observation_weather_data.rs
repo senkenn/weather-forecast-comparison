@@ -1,53 +1,41 @@
-use std::path::Path;
-
-use crate::{
-    enterprise_business_rules::domain::model::jma_observation_data::JmaObservationData,
-    // interface_adaptors::handler::correct_weather_data::{WeatherDataPayload, WeatherDataType},
-};
+use crate::application_business_rules::services_interface::s3_service::IS3Service;
+use crate::frameworks_drivers::csv_writer::jma_observation::CsvWriter;
+use crate::frameworks_drivers::date::date::DateWrapper;
+use crate::frameworks_drivers::scraper::jma_observation::Scraper;
+use crate::interface_adapters::s3_service::s3_service::S3Service;
+use crate::interface_adapters::scraper_interface::jma_observation::IScraper;
 use anyhow::Result;
-use aws_config::{meta::region::RegionProviderChain, BehaviorVersion};
-use aws_sdk_s3::{primitives::ByteStream, Client};
+use std::sync::Arc;
 use tracing::info;
 
-pub struct WeatherUsecase {}
+pub struct WeatherUsecase {
+    scraper: Scraper,
+    csv_writer: CsvWriter,
+    service: Arc<S3Service>,
+}
 
 impl WeatherUsecase {
-    pub fn new() -> Self {
-        WeatherUsecase {}
+    pub fn new(scraper: Scraper, csv_writer: CsvWriter, service: Arc<S3Service>) -> Self {
+        Self {
+            service,
+            scraper,
+            csv_writer,
+        }
     }
 
     pub async fn harvest_observation_weather_data(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let csv_file_name = JmaObservationData::create_csv_file().await?;
-        upload_to_s3(&csv_file_name).await?;
+        let yesterday = DateWrapper::now().get_yesterday();
+
+        let html = self.scraper.fetch_data(yesterday.clone()).await?;
+
+        let csv_file_name = self
+            .csv_writer
+            .create_csv_file(yesterday.clone(), html)
+            .await?;
+
+        self.service.upload_to_s3(csv_file_name).await?;
+
         info!("Corrected weather data");
         Ok(())
     }
-}
-
-async fn upload_to_s3(csv_file_path: &str) -> Result<()> {
-    // Initialize AWS configuration
-    let region_provider = RegionProviderChain::default_provider().or_else("ap-northeast-1");
-    let config = aws_config::defaults(BehaviorVersion::v2024_03_28())
-        .region(region_provider)
-        .load()
-        .await;
-    let client = Client::new(&config);
-
-    let bucket = "weather-forecast-comparison";
-    let key = format!("data/{}", csv_file_path);
-
-    // Read the CSV file into a byte stream
-    let byte_stream = ByteStream::from_path(Path::new(csv_file_path)).await?;
-
-    // Perform the upload
-    client
-        .put_object()
-        .bucket(bucket)
-        .key(key)
-        .body(byte_stream)
-        .send()
-        .await?;
-    info!("Uploaded CSV file to S3");
-
-    Ok(())
 }

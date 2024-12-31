@@ -1,0 +1,16 @@
+on:
+  pull_request:
+
+jobs:
+  unit_test:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Unit Test
+        run: cargo test
+        working-directory: packages/cron_jobs
