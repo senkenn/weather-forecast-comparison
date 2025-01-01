@@ -1,21 +1,23 @@
 use crate::application_business_rules::services_interface::s3_service::IS3Service;
-use crate::frameworks_drivers::csv_writer::jma_observation::CsvWriter;
 use crate::frameworks_drivers::date::date::DateWrapper;
-use crate::frameworks_drivers::scraper::jma_observation::Scraper;
+use crate::interface_adapters::csv_writer_interface::jma_observation::ICsvWriter;
 use crate::interface_adapters::s3_service::s3_service::S3Service;
 use crate::interface_adapters::scraper_interface::jma_observation::IScraper;
 use anyhow::Result;
-use std::sync::Arc;
 use tracing::info;
 
 pub struct WeatherUsecase {
-    scraper: Scraper,
-    csv_writer: CsvWriter,
-    service: Arc<S3Service>,
+    scraper: Box<dyn IScraper>,
+    csv_writer: Box<dyn ICsvWriter>,
+    service: Box<S3Service>,
 }
 
 impl WeatherUsecase {
-    pub fn new(scraper: Scraper, csv_writer: CsvWriter, service: Arc<S3Service>) -> Self {
+    pub fn new(
+        scraper: Box<dyn IScraper>,
+        csv_writer: Box<dyn ICsvWriter>,
+        service: Box<S3Service>,
+    ) -> Self {
         Self {
             service,
             scraper,
