@@ -16,6 +16,12 @@ impl JmaForecastHourlyScraper {
     }
 }
 
+impl JmaForecastDailyScraper {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 #[async_trait]
 impl IScraper for JmaForecastHourlyScraper {
     async fn fetch_data(&self, date: Option<DateWrapper>) -> Result<String> {

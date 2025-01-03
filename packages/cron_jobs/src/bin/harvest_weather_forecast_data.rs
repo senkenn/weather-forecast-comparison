@@ -1,7 +1,13 @@
-use cron_jobs::application_business_rules::usecase::harvest_forecast_data::ForecastUsecase;
-use cron_jobs::frameworks_drivers::csv_writer::jma_observation::CsvWriter;
+use cron_jobs::frameworks_drivers::csv_writer::jma_forecast_daily::JmaForecastDailyCsvWriter;
+use cron_jobs::frameworks_drivers::csv_writer::jma_forecast_hourly::JmaForecastHourlyCsvWriter;
 use cron_jobs::frameworks_drivers::scraper::jma_forecast::JmaForecastHourlyScraper;
+use cron_jobs::interface_adapters::csv_writer_interface::jma_observation::ICsvWriter;
 use cron_jobs::interface_adapters::s3_service::s3_service::S3Service;
+use cron_jobs::interface_adapters::scraper_interface::jma_observation::IScraper;
+use cron_jobs::{
+    application_business_rules::usecase::harvest_forecast_data::ForecastUsecase,
+    frameworks_drivers::scraper::jma_forecast::JmaForecastDailyScraper,
+};
 use dotenvy::dotenv;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -20,8 +26,14 @@ async fn main() {
         .init();
 
     let s3_service = Box::new(S3Service::new());
-    let scrapers = vec![JmaForecastHourlyScraper::new()];
-    let csv_writers = vec![CsvWriter::new()];
+    let scrapers: Vec<Box<dyn IScraper>> = vec![
+        Box::new(JmaForecastHourlyScraper::new()),
+        Box::new(JmaForecastDailyScraper::new()),
+    ];
+    let csv_writers: Vec<Box<dyn ICsvWriter>> = vec![
+        Box::new(JmaForecastHourlyCsvWriter::new()),
+        Box::new(JmaForecastDailyCsvWriter::new()),
+    ];
     let usecase = Box::new(ForecastUsecase::new(scrapers, csv_writers, s3_service));
     match usecase.harvest_weather_forecast_data().await {
         Ok(_) => {

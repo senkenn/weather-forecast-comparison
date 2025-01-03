@@ -1,4 +1,4 @@
-use cron_jobs::frameworks_drivers::csv_writer::jma_observation::CsvWriter;
+use cron_jobs::frameworks_drivers::csv_writer::jma_observation::JmaObservationCsvWriter;
 use cron_jobs::interface_adapters::s3_service::s3_service::S3Service;
 use cron_jobs::{
     application_business_rules::usecase::harvest_observation_weather_data::WeatherUsecase,
@@ -24,7 +24,7 @@ async fn main() {
 
     let s3_service = Box::new(S3Service::new());
     let scraper = Box::new(Scraper::new());
-    let csv_writer = Box::new(CsvWriter::new());
+    let csv_writer = Box::new(JmaObservationCsvWriter::new());
     let usecase = Box::new(WeatherUsecase::new(scraper, csv_writer, s3_service));
     match usecase.harvest_observation_weather_data().await {
         Ok(_) => {

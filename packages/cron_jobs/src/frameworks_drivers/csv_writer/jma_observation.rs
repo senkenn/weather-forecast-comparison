@@ -2,31 +2,35 @@ use anyhow::Result;
 use async_trait::async_trait;
 use csv::Writer;
 use scraper::{Html, Selector};
+use tracing::info;
 
 use crate::{
     frameworks_drivers::date::date::DateWrapper,
     interface_adapters::csv_writer_interface::jma_observation::ICsvWriter,
 };
 
-pub struct CsvWriter {}
+pub struct JmaObservationCsvWriter {}
 
-impl CsvWriter {
+impl JmaObservationCsvWriter {
     pub fn new() -> Self {
         Self {}
     }
 }
 
 #[async_trait]
-impl ICsvWriter for CsvWriter {
-    async fn create_csv_file(
-        &self,
-        date: DateWrapper,
-        html: String,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+impl ICsvWriter for JmaObservationCsvWriter {
+    async fn create_csv_file(&self, date: DateWrapper, html: String) -> Result<String> {
         // parse the HTML
         let document = Html::parse_document(&html);
+        if document.errors.len() > 0 {
+            return Err(anyhow::anyhow!(
+                "Failed to parse the HTML: {:?}",
+                document.errors
+            ));
+        }
 
-        let row_selector = Selector::parse("tr.mtx[style='text-align:right;']")?;
+        let row_selector = Selector::parse("tr.mtx[style='text-align:right;']")
+            .map_err(|e| anyhow::anyhow!("Failed to parse the selector: {:?}", e))?;
         let csv_file_name = format!(
             "jma_observation_{}_{}_{}.csv",
             date.get_year(),
@@ -73,7 +77,7 @@ impl ICsvWriter for CsvWriter {
             wtr.write_record(&record)?;
         }
         wtr.flush()?;
-        tracing::info!("Created CSV file: {}", csv_file_name);
+        info!("Created CSV file: {}", csv_file_name);
 
         Ok(csv_file_name)
     }
@@ -87,7 +91,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_csv_file() {
-        let csv_writer = CsvWriter::new();
+        let csv_writer = JmaObservationCsvWriter::new();
         let date = DateWrapper::new(2024, 11, 1).unwrap();
         let html =
             fs::read_to_string("./src/tests/fixtures/jma_observation_2024_11_1.html").unwrap();

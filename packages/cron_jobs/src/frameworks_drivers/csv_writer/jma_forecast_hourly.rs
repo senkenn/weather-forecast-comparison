@@ -1,5 +1,7 @@
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::Deserialize;
+use tracing::info;
 
 use crate::{
     frameworks_drivers::date::date::DateWrapper,
@@ -26,14 +28,15 @@ struct Forecast {
 }
 
 pub struct JmaForecastHourlyCsvWriter;
+impl JmaForecastHourlyCsvWriter {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
 
 #[async_trait]
 impl ICsvWriter for JmaForecastHourlyCsvWriter {
-    async fn create_csv_file(
-        &self,
-        date: DateWrapper,
-        json_str: String,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    async fn create_csv_file(&self, date: DateWrapper, json_str: String) -> Result<String> {
         let file_name = format!(
             "jma_forecast_hourly_{}_{}_{}.csv",
             date.get_year(),
@@ -53,6 +56,8 @@ impl ICsvWriter for JmaForecastHourlyCsvWriter {
         }
 
         wtr.flush()?;
+
+        info!("Created CSV file: {}", file_name);
 
         Ok(file_name)
     }

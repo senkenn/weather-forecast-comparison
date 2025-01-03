@@ -4,14 +4,18 @@ use crate::interface_adapters::csv_writer_interface::jma_observation::ICsvWriter
 use crate::interface_adapters::scraper_interface::jma_observation::IScraper;
 use anyhow::Result;
 
-pub struct ForecastUsecase<S: IScraper, C: ICsvWriter> {
-    scrapers: Vec<S>,
-    csv_writers: Vec<C>,
+pub struct ForecastUsecase {
+    scrapers: Vec<Box<dyn IScraper>>,
+    csv_writers: Vec<Box<dyn ICsvWriter>>,
     service: Box<dyn IS3Service>,
 }
 
-impl<S: IScraper, C: ICsvWriter> ForecastUsecase<S, C> {
-    pub fn new(scrapers: Vec<S>, csv_writers: Vec<C>, service: Box<dyn IS3Service>) -> Self {
+impl ForecastUsecase {
+    pub fn new(
+        scrapers: Vec<Box<dyn IScraper>>,
+        csv_writers: Vec<Box<dyn ICsvWriter>>,
+        service: Box<dyn IS3Service>,
+    ) -> Self {
         Self {
             scrapers,
             csv_writers,
