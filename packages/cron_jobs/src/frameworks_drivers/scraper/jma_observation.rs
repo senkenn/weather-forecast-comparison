@@ -17,7 +17,12 @@ impl Scraper {
 
 #[async_trait]
 impl IScraper for Scraper {
-    async fn fetch_data(&self, date: DateWrapper) -> Result<String> {
+    async fn fetch_data(&self, date: Option<DateWrapper>) -> Result<String> {
+        let date = match date {
+            Some(date) => date,
+            None => return Err(anyhow::anyhow!("Date must be Some")),
+        };
+
         let prec_no = 44; // Tokyo
         let block_no = 47662; // Tokyo
         let time_period = "hourly";

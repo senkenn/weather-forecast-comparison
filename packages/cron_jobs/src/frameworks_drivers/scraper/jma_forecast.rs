@@ -7,17 +7,22 @@ use crate::{
     interface_adapters::scraper_interface::jma_observation::IScraper,
 };
 
-pub struct JmaForecastScraper {}
+pub struct JmaForecastHourlyScraper;
+pub struct JmaForecastDailyScraper;
 
-impl JmaForecastScraper {
+impl JmaForecastHourlyScraper {
     pub fn new() -> Self {
         Self {}
     }
 }
 
 #[async_trait]
-impl IScraper for JmaForecastScraper {
-    async fn fetch_data(&self, date: DateWrapper) -> Result<String> {
+impl IScraper for JmaForecastHourlyScraper {
+    async fn fetch_data(&self, date: Option<DateWrapper>) -> Result<String> {
+        if date.is_some() {
+            return Err(anyhow::anyhow!("Date must be None"));
+        }
+
         let url = format!(
             "https://www.jma.go.jp/bosai/jmatile/data/wdist/VPFD/130010.json" // 東京都, 東京地方
         );
@@ -27,16 +32,18 @@ impl IScraper for JmaForecastScraper {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::frameworks_drivers::date::date::DateWrapper;
+#[async_trait]
+impl IScraper for JmaForecastDailyScraper {
+    async fn fetch_data(&self, date: Option<DateWrapper>) -> Result<String> {
+        if date.is_some() {
+            return Err(anyhow::anyhow!("Date must be None"));
+        }
 
-    #[tokio::test]
-    async fn test_fetch_data() {
-        let scraper = JmaForecastScraper::new();
-        let date = DateWrapper::new(2021, 1, 1).unwrap();
-        let json = scraper.fetch_data(date).await.unwrap();
-        println!("{}", json);
+        let url = format!(
+            "https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json" // 東京都, 東京地方
+        );
+        info!("Fetching HTML from {}", url);
+        let json = reqwest::get(url).await?.text().await?;
+        Ok(json)
     }
 }

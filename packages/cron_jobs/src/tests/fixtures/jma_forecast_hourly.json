@@ -1,0 +1,72 @@
+{
+  "firstAreaCode": "130010",
+  "publishingOffice": "気象庁",
+  "reportDateTime": "2025-01-03T11:00:00+09:00",
+  "infoType": "発表",
+  "areaTimeSeries": {
+    "timeDefines": [
+      { "dateTime": "2025-01-03T12:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-03T15:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-03T18:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-03T21:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T00:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T03:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T06:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T09:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T12:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T15:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T18:00:00+09:00", "duration": "PT3H" },
+      { "dateTime": "2025-01-04T21:00:00+09:00", "duration": "PT3H" }
+    ],
+    "weather": [
+      "くもり",
+      "くもり",
+      "くもり",
+      "くもり",
+      "くもり",
+      "くもり",
+      "くもり",
+      "晴れ",
+      "晴れ",
+      "晴れ",
+      "くもり",
+      "くもり"
+    ],
+    "wind": [
+      { "direction": "東", "speed": 2, "range": "3 5" },
+      { "direction": "東", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" },
+      { "direction": "北", "speed": 2, "range": "3 5" }
+    ]
+  },
+  "pointTimeSeries": {
+    "pointNameJP": "東京",
+    "pointNameEN": "Tokyo",
+    "timeDefines": [
+      { "dateTime": "2025-01-03T12:00:00+09:00" },
+      { "dateTime": "2025-01-03T15:00:00+09:00" },
+      { "dateTime": "2025-01-03T18:00:00+09:00" },
+      { "dateTime": "2025-01-03T21:00:00+09:00" },
+      { "dateTime": "2025-01-04T00:00:00+09:00" },
+      { "dateTime": "2025-01-04T03:00:00+09:00" },
+      { "dateTime": "2025-01-04T06:00:00+09:00" },
+      { "dateTime": "2025-01-04T09:00:00+09:00" },
+      { "dateTime": "2025-01-04T12:00:00+09:00" },
+      { "dateTime": "2025-01-04T15:00:00+09:00" },
+      { "dateTime": "2025-01-04T18:00:00+09:00" },
+      { "dateTime": "2025-01-04T21:00:00+09:00" },
+      { "dateTime": "2025-01-05T00:00:00+09:00" }
+    ],
+    "temperature": [8, 8, 7, 7, 5, 3, 3, 5, 8, 8, 6, 5, 4],
+    "maxTemperature": [9, 9, 9, "", "", "", "", 9, 9, 9, 9, "", ""],
+    "minTemperature": ["", "", "", "", 2, 2, 2, 2, "", "", "", "", ""]
+  }
+}

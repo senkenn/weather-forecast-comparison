@@ -23,7 +23,7 @@ impl<S: IScraper, C: ICsvWriter> ForecastUsecase<S, C> {
         for (scraper, csv_writer) in self.scrapers.iter().zip(self.csv_writers.iter()) {
             let now = DateWrapper::now();
 
-            let html = scraper.fetch_data(now.clone()).await?;
+            let html = scraper.fetch_data(None).await?;
 
             let csv_file_name = csv_writer.create_csv_file(now, html).await?;
 

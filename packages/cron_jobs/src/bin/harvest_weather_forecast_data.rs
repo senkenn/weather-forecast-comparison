@@ -1,6 +1,6 @@
 use cron_jobs::application_business_rules::usecase::harvest_forecast_data::ForecastUsecase;
 use cron_jobs::frameworks_drivers::csv_writer::jma_observation::CsvWriter;
-use cron_jobs::frameworks_drivers::scraper::jma_forecast::JmaForecastScraper;
+use cron_jobs::frameworks_drivers::scraper::jma_forecast::JmaForecastHourlyScraper;
 use cron_jobs::interface_adapters::s3_service::s3_service::S3Service;
 use dotenvy::dotenv;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
@@ -20,7 +20,7 @@ async fn main() {
         .init();
 
     let s3_service = Box::new(S3Service::new());
-    let scrapers = vec![JmaForecastScraper::new()];
+    let scrapers = vec![JmaForecastHourlyScraper::new()];
     let csv_writers = vec![CsvWriter::new()];
     let usecase = Box::new(ForecastUsecase::new(scrapers, csv_writers, s3_service));
     match usecase.harvest_weather_forecast_data().await {
