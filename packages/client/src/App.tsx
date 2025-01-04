@@ -11,7 +11,6 @@ import {
 import "./App.css";
 import { useEffect, useState } from "react";
 
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import eh_worker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvp_worker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
@@ -74,38 +73,12 @@ const DUCKDB_BUNDLES: duckdb.DuckDBBundles = {
   },
 };
 
-// S3 クライアントを作成
-const s3 = new S3Client({
-  region: "ap-northeast-1",
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY as string,
-  },
-});
-
 // ファイルを取得する関数
-async function getFileFromS3(bucketName: string, key: string): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: bucketName,
-    Key: key,
-  });
-  const response = await s3.send(command);
+async function getFileFromS3(filename: string): Promise<string> {
+  const domain = "";
 
-  const bodyStream = response.Body as ReadableStream;
-  const reader = bodyStream.getReader();
-  const decoder = new TextDecoder("utf-8");
-  let result = "";
-  let done = false;
-
-  while (!done) {
-    const { value, done: streamDone } = await reader.read();
-    done = streamDone;
-    if (value) {
-      result += decoder.decode(value, { stream: !done });
-    }
-  }
-
-  return result;
+  // cloudfront distribution を使っているので、domain は空文字列
+  return (await fetch(`${domain}/data/${filename}`)).text();
 }
 
 function App() {
@@ -116,16 +89,15 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const bucketName = "weather-forecast-comparison-data-store";
-      const key = "jma_observation_data_2024_11_1.csv";
-      const csvFIleName = key;
+      const filename = "jma_observation_data_2024_11_1.csv";
+      const csvFIleName = filename;
 
       try {
-        const fileContent = await getFileFromS3(bucketName, key);
+        const fileContent = await getFileFromS3(filename);
         setResult(fileContent);
 
         // text to csv file
-        new File([fileContent], key, { type: "text/csv" });
+        new File([fileContent], filename, { type: "text/csv" });
 
         const bundle = await duckdb.selectBundle(DUCKDB_BUNDLES);
         const logger = new duckdb.ConsoleLogger();
