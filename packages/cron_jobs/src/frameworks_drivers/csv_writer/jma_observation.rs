@@ -22,15 +22,12 @@ impl ICsvWriter for JmaObservationCsvWriter {
     async fn create_csv_file(&self, date: DateWrapper, html: String) -> Result<String> {
         // parse the HTML
         let document = Html::parse_document(&html);
-        if document.errors.len() > 0 {
-            return Err(anyhow::anyhow!(
-                "Failed to parse the HTML: {:?}",
-                document.errors
-            ));
+
+        // ルート要素に <html> タグが存在するかを確認
+        if !html.contains("<html") {
+            return Err(anyhow::anyhow!("Input is missing <html> tag"));
         }
 
-        let row_selector = Selector::parse("tr.mtx[style='text-align:right;']")
-            .map_err(|e| anyhow::anyhow!("Failed to parse the selector: {:?}", e))?;
         let csv_file_name = format!(
             "jma_observation_{}_{}_{}.csv",
             date.get_year(),
@@ -62,6 +59,8 @@ impl ICsvWriter for JmaObservationCsvWriter {
         wtr.write_record(&header)?;
 
         // write the records
+        let row_selector = Selector::parse("tr.mtx[style='text-align:right;']")
+            .map_err(|e| anyhow::anyhow!("Failed to parse the selector: {:?}", e))?;
         for row in document.select(&row_selector) {
             let mut record = vec![];
             for cell in row.select(&Selector::parse("td").unwrap()) {
@@ -90,7 +89,7 @@ mod tests {
     use std::fs;
 
     #[tokio::test]
-    async fn test_create_csv_file() {
+    async fn create_csv_file_ok() {
         let csv_writer = JmaObservationCsvWriter::new();
         let date = DateWrapper::new(2024, 11, 1).unwrap();
         let html =
@@ -134,5 +133,17 @@ mod tests {
         for (i, row) in rows.iter().enumerate() {
             assert_eq!(row, &expected_rows[i]);
         }
+    }
+
+    #[tokio::test]
+    async fn create_csv_file_err_input_json() {
+        let csv_writer = JmaObservationCsvWriter::new();
+        let date = DateWrapper::new(2024, 11, 1).unwrap();
+        let html = fs::read_to_string("./src/tests/fixtures/jma_forecast_daily.json").unwrap();
+
+        let err = csv_writer.create_csv_file(date, html).await.unwrap_err();
+        assert_eq!(err.to_string(), "Input is missing <html> tag");
+
+        // let csv = fs::read_to_string(csv_file_name.clone()).unwrap();
     }
 }

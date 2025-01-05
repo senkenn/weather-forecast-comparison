@@ -18,3 +18,5 @@ jobs:
 
       - name: Harvest the observation weather data
         run: ./packages/cron_jobs/target/release/harvest_observation_weather_data
+        env:
+          RUST_BACKTRACE: full

@@ -76,7 +76,7 @@ mod tests {
     async fn test_create_csv_file() {
         let csv_writer = JmaForecastDailyCsvWriter {};
         let date = DateWrapper::new(2021, 1, 1).unwrap();
-        let json_str = fs::read_to_string("src/tests/fixtures/jma_forecast_hourly.json").unwrap();
+        let json_str = fs::read_to_string("src/tests/fixtures/jma_forecast_daily.json").unwrap();
         let file_name = csv_writer.create_csv_file(date, json_str).await.unwrap();
         assert_eq!(file_name, "jma_forecast_daily_2021_1_1.csv");
 
