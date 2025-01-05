@@ -143,7 +143,5 @@ mod tests {
 
         let err = csv_writer.create_csv_file(date, html).await.unwrap_err();
         assert_eq!(err.to_string(), "Input is missing <html> tag");
-
-        // let csv = fs::read_to_string(csv_file_name.clone()).unwrap();
     }
 }
