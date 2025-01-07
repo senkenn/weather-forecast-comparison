@@ -28,11 +28,11 @@ async fn main() {
     let s3_service = Box::new(S3Service::new());
     let scrapers: Vec<Box<dyn IScraper>> = vec![
         Box::new(JmaForecastHourlyScraper::new()),
-        Box::new(JmaForecastDailyScraper::new()),
+        // Box::new(JmaForecastDailyScraper::new()),
     ];
     let csv_writers: Vec<Box<dyn ICsvWriter>> = vec![
         Box::new(JmaForecastHourlyCsvWriter::new()),
-        Box::new(JmaForecastDailyCsvWriter::new()),
+        // Box::new(JmaForecastDailyCsvWriter::new()),
     ];
     let usecase = Box::new(ForecastUsecase::new(scrapers, csv_writers, s3_service));
     match usecase.harvest_weather_forecast_data().await {
